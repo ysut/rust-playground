@@ -1,0 +1,6 @@
+/target
+/resources/hpo/hp.obo
+/resources/hpo/phenotype.hpoa
+/resources/hpo/genes_to_phenotype.txt
+/resources/hpo/phenotype_to_genes.txt
+
