@@ -4,3 +4,4 @@
 /resources/hpo/genes_to_phenotype.txt
 /resources/hpo/phenotype_to_genes.txt
 
+.DS_Store
