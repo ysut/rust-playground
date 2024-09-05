@@ -1,20 +1,54 @@
-use vcf::{VCFReader, U8Vec, VCFHeaderFilterAlt, VCFError, VCFRecord};
+// use vcf::{VCFReader, U8Vec, VCFHeaderFilterAlt, VCFError, VCFRecord};
+use vcf::{VCFReader, U8Vec, VCFHeaderFilterAlt, VCFError};
 use flate2::read::MultiGzDecoder;
 use std::fs::File;
 use std::io::BufReader;
 
-
 fn main() -> Result<(), VCFError> {
-    let input_vcf: &str = "../../resources/examples/nf.vep.vcf";
+    let path = env::current_dir()?;
+    println!("starting dir: {}", path.display());
+    // let input_vcf: &str = "../resources/examples/nf.vep.vcf";
+    let mut reader = VCFReader::new(BufReader::new(MultiGzDecoder::new(File::open(
+        "nf.vep.vcf",
+    )?)))?;
 
-    let open_file = File::open(input_vcf)?;
-    let gzdecoder = MultiGzDecoder::new(open_file);
-    let reader = VCFReader::new(BufReader::new(gzdecoder))?;
+    // access FILTER contents
+    assert_eq!(
+        Some(VCFHeaderFilterAlt {
+            id: b"PASS",
+            description: b"All filters passed"
+        }),
+        reader.header().filter(b"PASS")
+    );
 
-    println!(reaer.header());
-    
-    // let bufreader = BufReader::new(inner)
+    // access INFO contents
+    assert_eq!(
+        b"Stop position of the interval",
+        reader.header().info(b"END").unwrap().description
+    );
+
+    // prepare VCFRecord object
+    let mut vcf_record = reader.empty_record();
+
+    // read one record
+    reader.next_record(&mut vcf_record)?;
+
+   // get record attributes
+   assert_eq!(vcf_record.chromosome, b"13");
+   assert_eq!(vcf_record.position, 32872836);
+   assert_eq!(vcf_record.id, Vec::<U8Vec>::new());
+   assert_eq!(vcf_record.reference, b"A");
+   assert_eq!(vcf_record.alternative, vec![b"C"]);
+   assert_eq!(vcf_record.qual, Some(495.23));
+   assert_eq!(vcf_record.info(b"AC"), Some(&vec![b"1".to_vec()]));
+   assert_eq!(
+       vcf_record.genotype(b"SRP150637__HG00099", b"GT"),
+       Some(&vec![b"0/0".to_vec()])
+   );
+   assert_eq!(
+       vcf_record.genotype(b"SRP150637__HG00099", b"AD"),
+       Some(&vec![b"31".to_vec(), b"0".to_vec()])
+   );
 
     Ok(())
 }
-
