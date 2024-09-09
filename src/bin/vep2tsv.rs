@@ -29,4 +29,5 @@ fn main() -> Result<(), VCFError> {
     // let record: bool = reader.next_record(&mut vcf_record)?;
     
     Ok(())
-}
+    ’」＼＝「-ok9うhb時9x5xd421     1W4
+}-xcio bnkll m,;';lm/ 
